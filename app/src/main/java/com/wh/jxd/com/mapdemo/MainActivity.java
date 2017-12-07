@@ -15,10 +15,15 @@ import android.widget.Toast;
 
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.AMapOptions;
+import com.amap.api.maps.CameraUpdate;
+import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.LocationSource;
 import com.amap.api.maps.MapView;
 import com.amap.api.maps.UiSettings;
 import com.amap.api.maps.model.BitmapDescriptor;
+import com.amap.api.maps.model.CameraPosition;
+import com.amap.api.maps.model.LatLng;
+import com.amap.api.maps.model.LatLngBounds;
 import com.amap.api.maps.model.MyLocationStyle;
 
 /**
@@ -103,10 +108,35 @@ public class MainActivity extends AppCompatActivity implements AMap.OnMyLocation
         mBt_two.setOnClickListener(this);
         mBt_three.setOnClickListener(this);
         mBt_four.setOnClickListener(this);
-        initLocation();
-        //地图控件的交互
+//        initLocation();
+         //地图控件的交互
         showControls();
         setGestures();
+        //调用方法交互
+        callMethod();
+    }
+
+    /**
+     * 调用方法交互
+     */
+    private void callMethod() {
+        //地图视图移动动画
+//        CameraUpdate cameraUpdate = new CameraUpdate();
+//        mAMap.animateCamera(cameraUpdate);
+        //改变地图的中心点
+//        28.2277800000,112.9388600000
+        CameraUpdate mCameraUpdate = CameraUpdateFactory.newCameraPosition(new CameraPosition(new LatLng( 28.227780,112.938860),18,30,0));
+
+        mAMap.animateCamera(mCameraUpdate);
+        //限制地图的显示范围
+        //南、西
+//        LatLng southwestLatLng = new LatLng(30.080000, 108.470000);
+//        //北、东
+//        LatLng northeastLatLng = new LatLng(24.380000, 114.150000);
+//        LatLngBounds latLngBounds = new LatLngBounds(southwestLatLng, northeastLatLng);
+//        mAMap.setMapStatusLimits(latLngBounds);
+
+
     }
 
     /**
@@ -122,8 +152,8 @@ public class MainActivity extends AppCompatActivity implements AMap.OnMyLocation
         //倾斜
         mUiSettings.setTiltGesturesEnabled(true);
         //指定屏幕中心点
-       //x、y均为屏幕坐标，屏幕左上角为坐标原点，即(0,0)点。
-        mAMap.setPointToCenter(0,0);
+        //x、y均为屏幕坐标，屏幕左上角为坐标原点，即(0,0)点。
+        mAMap.setPointToCenter(0, 0);
         mAMap.getUiSettings().setGestureScaleByMapCenter(true);
     }
 
@@ -138,9 +168,7 @@ public class MainActivity extends AppCompatActivity implements AMap.OnMyLocation
         mUiSettings.setZoomControlsEnabled(true);
         //点击定位
 //        mAMap.setLocationSource(this);//通过aMap对象设置定位数据源的监听
-
         mUiSettings.setMyLocationButtonEnabled(false); //显示默认的定位按钮
-
 //        mAMap.setMyLocationEnabled(true);// 可触发定位并显示当前位置
         //比例尺控件
         mUiSettings.setScaleControlsEnabled(true);
