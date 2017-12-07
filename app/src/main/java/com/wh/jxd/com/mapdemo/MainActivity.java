@@ -10,10 +10,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.amap.api.maps.AMap;
+import com.amap.api.maps.AMapOptions;
+import com.amap.api.maps.LocationSource;
 import com.amap.api.maps.MapView;
+import com.amap.api.maps.UiSettings;
 import com.amap.api.maps.model.BitmapDescriptor;
 import com.amap.api.maps.model.MyLocationStyle;
 
@@ -21,14 +25,16 @@ import com.amap.api.maps.model.MyLocationStyle;
  * 一个地图的应用
  */
 
-public class MainActivity extends AppCompatActivity implements AMap.OnMyLocationChangeListener, View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements AMap.OnMyLocationChangeListener, View.OnClickListener, LocationSource {
     private MapView mMapView;
     MyLocationStyle myLocationStyle;
     private AMap mAMap;
+    private UiSettings mUiSettings;//定义一个UiSettings对象
     private Button mBt_one;
     private Button mBt_two;
     private Button mBt_three;
     private Button mBt_four;
+    private LinearLayout mLl_top;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,26 +91,61 @@ public class MainActivity extends AppCompatActivity implements AMap.OnMyLocation
     private void initView(Bundle savedInstanceState) {
         mMapView = (MapView) findViewById(R.id.map);
         mMapView.onCreate(savedInstanceState);
+        mLl_top = (LinearLayout) findViewById(R.id.ll_top);
         mBt_one = (Button) findViewById(R.id.bt_one);
         mBt_two = (Button) findViewById(R.id.bt_two);
         mBt_three = (Button) findViewById(R.id.bt_three);
         mBt_four = (Button) findViewById(R.id.bt_four);
+        //实例化对象
         mAMap = mMapView.getMap();
+        mUiSettings = mAMap.getUiSettings();
         mBt_one.setOnClickListener(this);
         mBt_two.setOnClickListener(this);
         mBt_three.setOnClickListener(this);
         mBt_four.setOnClickListener(this);
         initLocation();
-
+        //地图控件的交互
         showControls();
+        setGestures();
+    }
+
+    /**
+     * 设置手势
+     */
+    private void setGestures() {
+        //缩放
+        mUiSettings.setZoomGesturesEnabled(true);
+        //滑动
+        mUiSettings.setScrollGesturesEnabled(true);
+        //旋转
+        mUiSettings.setRotateGesturesEnabled(true);
+        //倾斜
+        mUiSettings.setTiltGesturesEnabled(true);
+        //指定屏幕中心点
+       //x、y均为屏幕坐标，屏幕左上角为坐标原点，即(0,0)点。
+        mAMap.setPointToCenter(0,0);
+        mAMap.getUiSettings().setGestureScaleByMapCenter(true);
     }
 
     /**
      * 显示控制的按钮
      */
     private void showControls() {
+//        mLl_top.setVisibility(View.GONE);
         //显示指南针
+        mUiSettings.setCompassEnabled(false);
+        //缩放按钮
+        mUiSettings.setZoomControlsEnabled(true);
+        //点击定位
+//        mAMap.setLocationSource(this);//通过aMap对象设置定位数据源的监听
 
+        mUiSettings.setMyLocationButtonEnabled(false); //显示默认的定位按钮
+
+//        mAMap.setMyLocationEnabled(true);// 可触发定位并显示当前位置
+        //比例尺控件
+        mUiSettings.setScaleControlsEnabled(true);
+        //控制LOGO的位置
+        mUiSettings.setLogoPosition(AMapOptions.LOGO_MARGIN_RIGHT);
 
     }
 
@@ -171,5 +212,20 @@ public class MainActivity extends AppCompatActivity implements AMap.OnMyLocation
                 mAMap.setMapType(AMap.MAP_TYPE_NAVI);
                 break;
         }
+    }
+
+    /**
+     * 定位数据源的监听
+     *
+     * @param onLocationChangedListener
+     */
+    @Override
+    public void activate(OnLocationChangedListener onLocationChangedListener) {
+
+    }
+
+    @Override
+    public void deactivate() {
+
     }
 }
