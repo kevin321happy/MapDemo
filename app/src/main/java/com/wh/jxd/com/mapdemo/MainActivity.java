@@ -9,10 +9,12 @@ import android.location.Location;
 import android.provider.SyncStateContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amap.api.maps.AMap;
@@ -32,6 +34,7 @@ import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.MyLocationStyle;
 import com.amap.api.maps.model.animation.Animation;
 import com.amap.api.maps.model.animation.RotateAnimation;
+import com.wh.jxd.com.mapdemo.inter.InfoWindowAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +43,7 @@ import java.util.List;
  * 一个地图的应用
  */
 
-public class MainActivity extends AppCompatActivity implements AMap.OnMyLocationChangeListener, View.OnClickListener, LocationSource, AMap.OnMarkerClickListener {
+public class MainActivity extends AppCompatActivity implements AMap.OnMyLocationChangeListener, View.OnClickListener, LocationSource, AMap.OnMarkerClickListener, AMap.OnInfoWindowClickListener {
     private MapView mMapView;
     MyLocationStyle myLocationStyle;
     private AMap mAMap;
@@ -117,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements AMap.OnMyLocation
         mUiSettings = mAMap.getUiSettings();
 
         mAMap.setOnMarkerClickListener(this);
+        mAMap.setOnInfoWindowClickListener(this);
         mBt_one.setOnClickListener(this);
         mBt_two.setOnClickListener(this);
         mBt_three.setOnClickListener(this);
@@ -129,6 +133,33 @@ public class MainActivity extends AppCompatActivity implements AMap.OnMyLocation
         callMethod(savedInstanceState);
         //地图上绘制点
         markOptions();
+        //自定义InfoWindow
+        CustomInfoWindow();
+    }
+
+    /**
+     * 自定义标记点的弹出window
+     */
+    private void CustomInfoWindow() {
+        AMap.InfoWindowAdapter infoWindowAdapter = new AMap.InfoWindowAdapter() {
+            @Override
+            public View getInfoWindow(Marker marker) {
+                return null;
+            }
+
+            View infoWindow = null;
+
+            @Override
+            public View getInfoContents(Marker marker) {
+                if (infoWindow == null) {
+                    infoWindow = LayoutInflater.from(MainActivity.this).inflate(
+                            R.layout.custom_info_window, null);
+                }
+                render(marker, infoWindow);
+                return infoWindow;
+            }
+        };
+        mAMap.setInfoWindowAdapter(infoWindowAdapter);
     }
 
     private void markOptions() {
@@ -347,11 +378,12 @@ public class MainActivity extends AppCompatActivity implements AMap.OnMyLocation
     @Override
     public boolean onMarkerClick(Marker marker) {
         //返回true自己处理点击事件
-        showMarkAnimation(marker);
-        MarkerOptions options = marker.getOptions();
-        Toast.makeText(this, options.getSnippet(), Toast.LENGTH_SHORT).show();
-        return true;
+//        showMarkAnimation(marker);
+//        MarkerOptions options = marker.getOptions();
+//        Toast.makeText(this, options.getSnippet(), Toast.LENGTH_SHORT).show();
+        return false;
     }
+
     /**
      * 显示标记点的动画
      *
@@ -364,5 +396,25 @@ public class MainActivity extends AppCompatActivity implements AMap.OnMyLocation
         animation.setInterpolator(new LinearInterpolator());
         marker.setAnimation(animation);
         marker.startAnimation();
+    }
+
+    /**
+     * 自定义infowindow样式
+     */
+    public void render(Marker marker, View view) {
+        TextView tv_title = (TextView) view.findViewById(R.id.tv_title);
+        TextView tv_content = (TextView) view.findViewById(R.id.tv_content);
+        tv_title.setText(marker.getTitle());
+        tv_content.setText(marker.getSnippet());
+
+    }
+
+    /**
+     * infoWindow的点击事件
+     * @param marker
+     */
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+
     }
 }
