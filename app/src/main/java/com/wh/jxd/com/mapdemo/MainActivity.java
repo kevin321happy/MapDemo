@@ -6,9 +6,11 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.provider.SyncStateContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -21,16 +23,24 @@ import com.amap.api.maps.LocationSource;
 import com.amap.api.maps.MapView;
 import com.amap.api.maps.UiSettings;
 import com.amap.api.maps.model.BitmapDescriptor;
+import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.CameraPosition;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.LatLngBounds;
+import com.amap.api.maps.model.Marker;
+import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.MyLocationStyle;
+import com.amap.api.maps.model.animation.Animation;
+import com.amap.api.maps.model.animation.RotateAnimation;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 一个地图的应用
  */
 
-public class MainActivity extends AppCompatActivity implements AMap.OnMyLocationChangeListener, View.OnClickListener, LocationSource {
+public class MainActivity extends AppCompatActivity implements AMap.OnMyLocationChangeListener, View.OnClickListener, LocationSource, AMap.OnMarkerClickListener {
     private MapView mMapView;
     MyLocationStyle myLocationStyle;
     private AMap mAMap;
@@ -40,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements AMap.OnMyLocation
     private Button mBt_three;
     private Button mBt_four;
     private LinearLayout mLl_top;
+    private List<LatLng> mMarkerOptions = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,39 +115,108 @@ public class MainActivity extends AppCompatActivity implements AMap.OnMyLocation
         //实例化对象
         mAMap = mMapView.getMap();
         mUiSettings = mAMap.getUiSettings();
+
+        mAMap.setOnMarkerClickListener(this);
         mBt_one.setOnClickListener(this);
         mBt_two.setOnClickListener(this);
         mBt_three.setOnClickListener(this);
         mBt_four.setOnClickListener(this);
-//        initLocation();
-         //地图控件的交互
+        initLocation();
+        //地图控件的交互
         showControls();
         setGestures();
         //调用方法交互
-        callMethod();
+        callMethod(savedInstanceState);
+        //地图上绘制点
+        markOptions();
     }
+
+    private void markOptions() {
+        mMarkerOptions.add(new LatLng(28.227780, 112.938860));
+        mMarkerOptions.add(new LatLng(28.227481, 112.937862));
+        mMarkerOptions.add(new LatLng(28.227782, 112.938863));
+        mMarkerOptions.add(new LatLng(28.223783, 112.932864));
+        mMarkerOptions.add(new LatLng(28.217784, 112.968865));
+
+        for (LatLng latLng : mMarkerOptions) {
+            MarkerOptions markerOption = new MarkerOptions();
+            markerOption.position(latLng);
+            markerOption.title("长沙市").snippet("湖南省省会，古称潭州，别名星城");
+            markerOption.draggable(true);//设置Marker可拖动
+            markerOption.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
+                    .decodeResource(getResources(), R.drawable.ic_party)));
+            // 将Marker设置为贴地显示，可以双指下拉地图查看效果
+            markerOption.setFlat(true);
+            //设置marker平贴地图效果
+            mAMap.addMarker(markerOption);
+        }
+//        LatLng latLng = new LatLng(28.227780, 112.938860);
+//        LatLng latLng1 = new LatLng(28.227481, 112.937862);
+//        LatLng latLng2 = new LatLng(28.227782, 112.938863);
+//        LatLng latLng3 = new LatLng(28.223783, 112.932864);
+//        LatLng latLng4 = new LatLng(28.217784, 112.968865);
+//
+//        final Marker marker = mAMap.addMarker(new MarkerOptions().position(latLng).title("湖南华顺").snippet("View的大小不仅由自身所决定"));
+//        final Marker marker1 = mAMap.addMarker(new MarkerOptions().position(latLng1).title("政府").snippet("这种情况下需要开启新的线程"));
+//        final Marker marker2 = mAMap.addMarker(new MarkerOptions().position(latLng2).title("银行").snippet("高德开放平台目前开放了Android 地图"));
+//        final Marker marker3 = mAMap.addMarker(new MarkerOptions().position(latLng3).title("体育馆").snippet("View和Activity一样的，"));
+//        final Marker marker4 = mAMap.addMarker(new MarkerOptions().position(latLng4).title("饭店").snippet("金麓国际大酒店........"));
+        //自定义绘制mark
+//        MarkerOptions markerOption = new MarkerOptions();
+//        LatLng latLng = new LatLng(28.221780, 112.938860);
+//        markerOption.position(latLng);
+////        markerOptions.position(SyncStateContract.Constants.XIAN);
+//        markerOption.title("长沙市").snippet("长沙市：28.227481, 112.937862");
+//        markerOption.draggable(true);//设置Marker可拖动
+//        markerOption.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
+//                .decodeResource(getResources(), R.drawable.ic_party)));
+//        // 将Marker设置为贴地显示，可以双指下拉地图查看效果
+//        markerOption.setFlat(true);//设置marker平贴地图效果
+//        mAMap.addMarker(markerOption);
+
+    }
+
 
     /**
      * 调用方法交互
+     *
+     * @param savedInstanceState
      */
-    private void callMethod() {
+    private void callMethod(Bundle savedInstanceState) {
         //地图视图移动动画
 //        CameraUpdate cameraUpdate = new CameraUpdate();
 //        mAMap.animateCamera(cameraUpdate);
         //改变地图的中心点
 //        28.2277800000,112.9388600000
-        CameraUpdate mCameraUpdate = CameraUpdateFactory.newCameraPosition(new CameraPosition(new LatLng( 28.227780,112.938860),18,30,0));
+        CameraUpdate mCameraUpdate = CameraUpdateFactory.newCameraPosition(new CameraPosition(new LatLng(28.227780, 112.938860), 18, 30, 0));
 
         mAMap.animateCamera(mCameraUpdate);
+        //设置缩放的级别
+        mAMap.moveCamera(CameraUpdateFactory.zoomTo(14));
         //限制地图的显示范围
         //南、西
 //        LatLng southwestLatLng = new LatLng(30.080000, 108.470000);
-//        //北、东
+        //北、东
 //        LatLng northeastLatLng = new LatLng(24.380000, 114.150000);
 //        LatLngBounds latLngBounds = new LatLngBounds(southwestLatLng, northeastLatLng);
 //        mAMap.setMapStatusLimits(latLngBounds);
-
-
+        //改变地图的默认显示区域
+        // 定义长沙市经纬度坐标（此处以长沙坐标为例）
+//        28.2277800000,112.9388600000
+//        LatLng centerBJPoint= new LatLng(28.227780,112.938860);
+//// 定义了一个配置 AMap 对象的参数类
+//        AMapOptions mapOptions = new AMapOptions();
+// 设置了一个可视范围的初始化位置
+// CameraPosition 第一个参数： 目标位置的屏幕中心点经纬度坐标。
+// CameraPosition 第二个参数： 目标可视区域的缩放级别
+// CameraPosition 第三个参数： 目标可视区域的倾斜度，以角度为单位。
+// CameraPosition 第四个参数： 可视区域指向的方向，以角度为单位，从正北向顺时针方向计算，从0度到360度
+//        mapOptions.camera(new CameraPosition(centerBJPoint, 10f, 0, 0));
+//// 定义一个 MapView 对象，构造方法中传入 mapOptions 参数类
+//        MapView mapView = new MapView(this, mapOptions);
+//
+//// 调用 onCreate方法 对 MapView LayoutParams 设置
+//        mapView.onCreate(savedInstanceState);
     }
 
     /**
@@ -153,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements AMap.OnMyLocation
         mUiSettings.setTiltGesturesEnabled(true);
         //指定屏幕中心点
         //x、y均为屏幕坐标，屏幕左上角为坐标原点，即(0,0)点。
-        mAMap.setPointToCenter(0, 0);
+//        mAMap.setPointToCenter(0, 0);
         mAMap.getUiSettings().setGestureScaleByMapCenter(true);
     }
 
@@ -255,5 +335,34 @@ public class MainActivity extends AppCompatActivity implements AMap.OnMyLocation
     @Override
     public void deactivate() {
 
+    }
+
+
+    /**
+     * 标记点的点击事件
+     *
+     * @param marker
+     * @return
+     */
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        //返回true自己处理点击事件
+        showMarkAnimation(marker);
+        MarkerOptions options = marker.getOptions();
+        Toast.makeText(this, options.getSnippet(), Toast.LENGTH_SHORT).show();
+        return true;
+    }
+    /**
+     * 显示标记点的动画
+     *
+     * @param marker
+     */
+    private void showMarkAnimation(Marker marker) {
+        Animation animation = new RotateAnimation(marker.getRotateAngle(), marker.getRotateAngle() + 180, 0, 0, 0);
+        long duration = 1000L;
+        animation.setDuration(duration);
+        animation.setInterpolator(new LinearInterpolator());
+        marker.setAnimation(animation);
+        marker.startAnimation();
     }
 }
