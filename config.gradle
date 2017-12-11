@@ -8,6 +8,13 @@ ext {
             applicationId    : "com.wh.jxd.com.mapdemo",
             versionCode      : 40,
             versionName      : "2.2.0",
+
+//            compile 'com.android.support:appcompat-v7:22.2.0'
+//            compile 'com.android.support:design:22.2.0'
+//            compile 'com.android.support:recyclerview-v7:22.2.0'
+//            compile 'com.android.support:cardview-v7:22.2.0'
+
+
     ]
     dependVersion = [
             support: "25.4.0"
@@ -19,6 +26,7 @@ ext {
             appcompatV7     : "com.android.support:appcompat-v7:${dependVersion.support}",
             design          : "com.android.support:design:${dependVersion.support}",
             junit           : "junit:junit:4.12",
+            cardView        : "com.android.support:cardview-v7:${dependVersion.support}",
             constraintLayout: 'com.android.support.constraint:constraint-layout:1.0.2',
             //------------- 测试 -------------
             espresso        : "com.android.support.test.espresso:espresso-core:2.2.2",

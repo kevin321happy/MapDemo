@@ -36,7 +36,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="夜间模式" />
+            android:text="夜间图" />
 
         <Button
             android:id="@+id/bt_four"
@@ -44,5 +44,12 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="交通图" />
+
+        <Button
+            android:id="@+id/bt_five"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="换视角" />
     </LinearLayout>
 </FrameLayout>
